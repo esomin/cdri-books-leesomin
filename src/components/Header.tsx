@@ -34,10 +34,10 @@ export const Header: React.FC<HeaderProps> = ({
             <TabsTrigger value="search" variant="line">
               도서 검색
             </TabsTrigger>
-            <TabsTrigger value="bookmarks" variant="line" className="gap-1.5">
+            <TabsTrigger value="bookmarks" variant="line" className="relative">
               <span>내가 찜한 책</span>
               {bookmarkCount > 0 && (
-                <span className="text-small bg-light-gray text-text-primary px-1.5 py-0.5 rounded-full font-medium">
+                <span className="absolute left-full ml-1.5 text-small bg-light-gray text-text-primary px-1.5 py-0.5 rounded-full font-medium tabular-nums">
                   {bookmarkCount}
                 </span>
               )}

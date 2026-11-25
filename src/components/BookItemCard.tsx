@@ -51,16 +51,10 @@ export const BookItemCard: React.FC<BookItemCardProps> = ({
             : 'max-h-24 opacity-100'
           }`}
       >
-        <div
-          className="flex items-center justify-between gap-4 cursor-pointer select-none py-0.5"
-          onClick={toggleExpand}
-        >
+        <div className="flex items-center justify-between gap-4 select-none py-0.5">
           {/* 좌측: 도서 썸네일 & 제목 / 저자 */}
           <div className="flex items-center gap-4 min-w-0">
-              <div
-                onClick={(e) => e.stopPropagation()}
-                className="relative w-14 h-20 bg-light-gray rounded-[4px] border border-black/8 shadow-xs shrink-0 overflow-hidden flex items-center justify-center cursor-default"
-              >
+              <div className="relative w-14 h-20 bg-light-gray rounded-[4px] border border-black/8 shadow-xs shrink-0 overflow-hidden flex items-center justify-center">
                 {book.thumbnail ? (
                   <img
                     src={book.thumbnail}
@@ -78,10 +72,10 @@ export const BookItemCard: React.FC<BookItemCardProps> = ({
                     onToggleBookmark(book);
                   }}
                   aria-label={isBookmarked ? '찜 해제' : '찜하기'}
-                  className="absolute top-1 right-1 z-10 p-1 rounded-full bg-white/85 shadow-xs hover:scale-110 transition-transform cursor-pointer"
+                  className="absolute top-1 right-1 z-10 p-0.5 rounded-full bg-white/85 shadow-xs cursor-pointer"
                 >
                   <Heart
-                    className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-red stroke-none' : 'stroke-gray fill-none'
+                    className={`w-2.5 h-2.5 ${isBookmarked ? 'fill-red stroke-none' : 'stroke-gray fill-none'
                       }`}
                   />
                 </button>

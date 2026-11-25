@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { useRecentSearches } from '../hooks/useRecentSearches';
 import { RecentSearchesPopover } from './RecentSearchesPopover';
 
@@ -67,10 +67,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
   return (
     <div className="relative flex items-center gap-3 w-full">
-      {/* 
-        굵은 블랙 테두리(border-2 border-black) + 3px 라운딩
-        돋보기 버튼은 별도 배경색 없이 인풋 내부 우측에 자연스럽게 위치
-      */}
       <div className="relative flex-1 flex items-center h-12 bg-white border border-gray focus-within:border-primary rounded-[var(--radius-button)] px-3.5 transition-colors">
         <input
           type="text"
@@ -82,6 +78,17 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           placeholder="검색어를 입력하세요"
           className="flex-1 h-full text-body2 text-text-primary placeholder:text-text-subtitle outline-none bg-transparent pr-2"
         />
+        {keyword && (
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => setKeyword('')}
+            aria-label="검색어 지우기"
+            className="p-1 text-text-subtitle hover:text-text-primary transition-colors cursor-pointer shrink-0 bg-transparent"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
         <button
           type="button"
           onClick={handleSearchSubmit}
