@@ -1,35 +1,40 @@
 import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger } from './ui/Tabs';
 
-export type TabType = 'search' | 'bookmarks';
-
 interface HeaderProps {
-  currentTab: TabType;
-  onTabChange: (tab: TabType) => void;
   bookmarkCount?: number;
+  lastSearchUrl?: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  currentTab,
-  onTabChange,
   bookmarkCount = 0,
+  lastSearchUrl = '/search',
 }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const currentTab = location.pathname.startsWith('/bookmarks') ? 'bookmarks' : 'search';
+
+  const handleTabChange = (val: string) => {
+    if (val === 'bookmarks') {
+      navigate('/bookmarks');
+    } else {
+      navigate(lastSearchUrl);
+    }
+  };
   return (
     <header className="border-b border-gray bg-white sticky top-0 z-10">
       <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
         <div
           className="flex items-center gap-2 cursor-pointer select-none"
-          onClick={() => onTabChange('search')}
+          onClick={() => handleTabChange('search')}
         >
           <h1 className="text-title1 font-bold text-black tracking-tight">
             CERTICOS BOOKS
           </h1>
         </div>
 
-        <Tabs
-          value={currentTab}
-          onValueChange={(val) => onTabChange(val as TabType)}
-        >
+        <Tabs value={currentTab} onValueChange={handleTabChange}>
           <TabsList variant="line">
             <TabsTrigger value="search" variant="line">
               도서 검색

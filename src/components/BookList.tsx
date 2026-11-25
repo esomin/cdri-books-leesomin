@@ -39,7 +39,7 @@ export const BookList: React.FC<BookListProps> = ({
           <div className="w-16 h-16 rounded-full bg-light-gray flex items-center justify-center mb-4">
             <BookOpen className="w-8 h-8 text-text-subtitle" />
           </div>
-          <p className="text-caption text-text-subtitle">{emptyMessage}</p>
+          <p className="text-body2 text-text-subtitle">{emptyMessage}</p>
         </div>
       )}
 
