@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { useRecentSearches } from '../hooks/useRecentSearches';
 import { RecentSearchesPopover } from './RecentSearchesPopover';
@@ -9,6 +9,7 @@ interface SearchBarProps {
   onFocus?: () => void;
   onBlur?: () => void;
   rightAction?: React.ReactNode;
+  resetTrigger?: number;
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({
@@ -17,10 +18,17 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   onFocus,
   onBlur,
   rightAction,
+  resetTrigger = 0,
 }) => {
   const [keyword, setKeyword] = useState(initialKeyword);
   const [isFocused, setIsFocused] = useState(false);
   const { recentSearches, addSearch, removeSearch } = useRecentSearches();
+
+  useEffect(() => {
+    if (resetTrigger > 0) {
+      setKeyword('');
+    }
+  }, [resetTrigger]);
 
   const submitSearch = (rawKeyword: string) => {
     const trimmed = rawKeyword.trim();
