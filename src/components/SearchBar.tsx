@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { useRecentSearches } from '../hooks/useRecentSearches';
 import { RecentSearchesPopover } from './RecentSearchesPopover';
@@ -21,14 +21,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   resetTrigger = 0,
 }) => {
   const [keyword, setKeyword] = useState(initialKeyword);
+  const [prevResetTrigger, setPrevResetTrigger] = useState(resetTrigger);
   const [isFocused, setIsFocused] = useState(false);
   const { recentSearches, addSearch, removeSearch } = useRecentSearches();
 
-  useEffect(() => {
-    if (resetTrigger > 0) {
-      setKeyword('');
-    }
-  }, [resetTrigger]);
+  if (resetTrigger !== prevResetTrigger) {
+    setPrevResetTrigger(resetTrigger);
+    setKeyword('');
+  }
 
   const submitSearch = (rawKeyword: string) => {
     const trimmed = rawKeyword.trim();

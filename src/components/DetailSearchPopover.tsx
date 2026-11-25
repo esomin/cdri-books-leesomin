@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { Button } from './ui/Button';
 import type { SearchTarget } from '../types/book';
@@ -24,13 +24,13 @@ export const DetailSearchPopover: React.FC<DetailSearchPopoverProps> = ({
 }) => {
   const [target, setTarget] = useState<SearchTarget>('title');
   const [query, setQuery] = useState('');
+  const [prevResetTrigger, setPrevResetTrigger] = useState(resetTrigger);
 
-  useEffect(() => {
-    if (resetTrigger > 0) {
-      setTarget('title');
-      setQuery('');
-    }
-  }, [resetTrigger]);
+  if (resetTrigger !== prevResetTrigger) {
+    setPrevResetTrigger(resetTrigger);
+    setTarget('title');
+    setQuery('');
+  }
 
   if (!isOpen) {
     return null;
