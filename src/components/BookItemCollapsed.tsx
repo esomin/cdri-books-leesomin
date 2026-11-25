@@ -55,7 +55,7 @@ export const BookItemCollapsed: React.FC<BookItemCollapsedProps> = ({
           </div>
 
           <div className="min-w-0 flex items-baseline gap-2">
-            <h3 className="text-[13px] font-bold text-text-primary truncate hover:text-primary transition-colors">
+            <h3 className="text-[13px] font-bold text-text-primary truncate">
               {book.title}
             </h3>
             <span className="text-[12px] text-text-secondary truncate shrink-0">

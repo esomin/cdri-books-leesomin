@@ -53,16 +53,16 @@ export const RecentSearchesPopover: React.FC<RecentSearchesPopoverProps> = ({
       ref={popoverRef}
       role="listbox"
       aria-label="최근 검색어"
-      className="absolute left-0 right-0 top-full mt-2 z-20 bg-white border border-gray-200 rounded-lg shadow-lg py-2"
+      className="absolute left-0 right-0 top-full mt-2 z-20 bg-white border border-gray rounded-lg shadow-lg py-2"
     >
-      <ul className="divide-y divide-gray-100">
+      <ul className="divide-y divide-light-gray">
           {
             items.map((item, index) => (
               <li
                 key={item.id}
                 role="option"
                 aria-selected={index === activeIndex}
-                className={`flex items-center justify-between px-4 py-2 transition-colors ${index === activeIndex ? 'bg-gray-100' : 'hover:bg-gray-50'
+                className={`flex items-center justify-between px-4 py-2 transition-colors ${index === activeIndex ? 'bg-light-gray' : 'hover:bg-light-gray/60'
                   }`}
               >
                 <button

@@ -72,9 +72,9 @@ export const DetailSearchPopover: React.FC<DetailSearchPopoverProps> = ({
       ref={popoverRef}
       role="dialog"
       aria-label="상세 검색"
-      className="absolute right-0 top-full mt-2 z-30 w-80 sm:w-96 bg-white border border-gray-200 rounded-lg shadow-lg p-5"
+      className="absolute right-0 top-full mt-2 z-30 w-80 sm:w-96 bg-white border border-gray rounded-lg shadow-lg pt-3 px-5 pb-5"
     >
-      <div className="flex justify-end mb-2">
+      <div className="flex justify-end mb-1">
         <button
           type="button"
           onClick={onClose}
@@ -91,7 +91,7 @@ export const DetailSearchPopover: React.FC<DetailSearchPopoverProps> = ({
             value={target}
             onChange={(e) => setTarget(e.target.value as SearchTarget)}
             aria-label="검색 조건"
-            className="h-10 px-2 border-b border-gray-300 text-body2 text-text-primary bg-white outline-none focus:border-primary cursor-pointer"
+            className="h-10 px-2 border-b border-gray text-body2 text-text-primary bg-white outline-none focus:border-primary cursor-pointer"
           >
             {TARGET_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -105,7 +105,7 @@ export const DetailSearchPopover: React.FC<DetailSearchPopoverProps> = ({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="검색어 입력"
-            className="flex-1 h-10 px-2 border-b border-gray-300 text-body2 text-text-primary placeholder:text-text-subtitle outline-none focus:border-primary bg-transparent"
+            className="flex-1 h-10 px-2 border-b border-gray text-body2 text-text-primary placeholder:text-text-subtitle outline-none focus:border-primary bg-transparent"
           />
         </div>
 

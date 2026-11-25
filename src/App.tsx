@@ -101,7 +101,7 @@ export function App() {
                         <button
                           type="button"
                           onClick={() => setIsDetailOpen((prev) => !prev)}
-                          className="h-12 px-4 border border-gray-300 rounded-[var(--radius-button)] text-body2 text-text-subtitle hover:text-text-primary hover:border-gray-400 transition-colors cursor-pointer bg-white"
+                          className="h-12 px-4 border border-gray rounded-[var(--radius-button)] text-body2 text-text-subtitle hover:text-text-primary hover:border-text-subtitle transition-colors cursor-pointer bg-white"
                         >
                           상세검색
                         </button>
