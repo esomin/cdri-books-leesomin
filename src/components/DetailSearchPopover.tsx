@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { Button } from './ui/Button';
 import type { SearchTarget } from '../types/book';
@@ -25,12 +25,36 @@ export const DetailSearchPopover: React.FC<DetailSearchPopoverProps> = ({
   const [target, setTarget] = useState<SearchTarget>('title');
   const [query, setQuery] = useState('');
   const [prevResetTrigger, setPrevResetTrigger] = useState(resetTrigger);
+  const popoverRef = useRef<HTMLDivElement>(null);
 
   if (resetTrigger !== prevResetTrigger) {
     setPrevResetTrigger(resetTrigger);
     setTarget('title');
     setQuery('');
   }
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    const handleMouseDown = (e: MouseEvent) => {
+      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handleMouseDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleMouseDown);
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) {
     return null;
@@ -45,6 +69,7 @@ export const DetailSearchPopover: React.FC<DetailSearchPopoverProps> = ({
 
   return (
     <div
+      ref={popoverRef}
       role="dialog"
       aria-label="상세 검색"
       className="absolute right-0 top-full mt-2 z-30 w-80 sm:w-96 bg-white border border-gray-200 rounded-lg shadow-lg p-5"

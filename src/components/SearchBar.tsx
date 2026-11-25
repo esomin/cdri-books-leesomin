@@ -23,6 +23,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   const [keyword, setKeyword] = useState(initialKeyword);
   const [prevResetTrigger, setPrevResetTrigger] = useState(resetTrigger);
   const [isFocused, setIsFocused] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const { recentSearches, addSearch, removeSearch } = useRecentSearches();
 
   if (resetTrigger !== prevResetTrigger) {
@@ -40,9 +41,29 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (isFocused && recentSearches.length > 0) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setActiveIndex((prev) => (prev + 1) % recentSearches.length);
+        return;
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setActiveIndex((prev) =>
+          prev <= 0 ? recentSearches.length - 1 : prev - 1
+        );
+        return;
+      }
+    }
+
     if (e.key === 'Enter') {
       e.preventDefault();
-      submitSearch(keyword);
+      if (isFocused && activeIndex >= 0 && recentSearches[activeIndex]) {
+        handleSelectRecent(recentSearches[activeIndex].keyword);
+        setActiveIndex(-1);
+      } else {
+        submitSearch(keyword);
+      }
     }
   };
 
@@ -57,11 +78,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleFocus = () => {
     setIsFocused(true);
+    setActiveIndex(-1);
     onFocus?.();
   };
 
   const handleBlur = () => {
     setIsFocused(false);
+    setActiveIndex(-1);
     onBlur?.();
   };
 
@@ -101,8 +124,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         <RecentSearchesPopover
           items={recentSearches}
           isOpen={isFocused}
+          activeIndex={activeIndex}
           onSelect={handleSelectRecent}
           onRemove={removeSearch}
+          onClose={() => {
+            setIsFocused(false);
+            setActiveIndex(-1);
+          }}
         />
       </div>
 
