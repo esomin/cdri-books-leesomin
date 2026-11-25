@@ -1,102 +1,80 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { searchBooks } from '../api/bookApi';
 import type { BookItem, SearchCondition } from '../types/book';
 
-export function useBookSearch() {
-  const [query, setQuery] = useState('');
-  const [condition, setCondition] = useState<SearchCondition | null>(null);
-  const [books, setBooks] = useState<BookItem[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isEnd, setIsEnd] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+interface ActiveSearchParams {
+  query: string;
+  target?: SearchCondition['target'];
+}
 
-  // 현재 실행 중인 검색 조건을 추적하기 위한 ref
-  const activeParamsRef = useRef<{ query: string; target?: SearchCondition['target'] }>({
+export function useBookSearch() {
+  const [searchParams, setSearchParams] = useState<ActiveSearchParams>({
     query: '',
   });
 
-  // 새 검색어 또는 상세 조건으로 첫 페이지 검색 실행
+  const {
+    data,
+    error,
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['books', searchParams.query, searchParams.target],
+    queryFn: ({ pageParam }) =>
+      searchBooks({
+        query: searchParams.query,
+        page: pageParam,
+        size: 10,
+        target: searchParams.target,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.meta.is_end ? undefined : allPages.length + 1,
+    enabled: Boolean(searchParams.query),
+  });
+
   const executeSearch = useCallback(
-    async (newQuery: string, searchTarget?: SearchCondition['target']) => {
+    (newQuery: string, searchTarget?: SearchCondition['target']) => {
       const trimmed = newQuery.trim();
-      if (!trimmed) {
-        setQuery('');
-        setBooks([]);
-        setTotalCount(0);
-        setPage(1);
-        setIsEnd(true);
-        return;
-      }
-
-      setQuery(trimmed);
-      setPage(1);
-      setIsLoading(true);
-      setError(null);
-      activeParamsRef.current = { query: trimmed, target: searchTarget };
-
-      try {
-        const response = await searchBooks({
-          query: trimmed,
-          page: 1,
-          size: 10,
-          target: searchTarget,
-        });
-
-        setBooks(response.documents);
-        setTotalCount(response.meta.total_count);
-        setIsEnd(response.meta.is_end);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : '도서 검색 중 오류가 발생했습니다.');
-        setBooks([]);
-        setTotalCount(0);
-        setIsEnd(true);
-      } finally {
-        setIsLoading(false);
-      }
+      setSearchParams({
+        query: trimmed,
+        target: trimmed ? searchTarget : undefined,
+      });
     },
     []
   );
 
-  // 무한 스크롤을 통한 다음 페이지 로드
-  const loadMore = useCallback(async () => {
-    if (isLoading || isEnd || !activeParamsRef.current.query) {
-      return;
+  const loadMore = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      void fetchNextPage();
     }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-    const nextPage = page + 1;
-    setIsLoading(true);
+  const books: BookItem[] = useMemo(
+    () => data?.pages.flatMap((page) => page.documents) ?? [],
+    [data]
+  );
 
-    try {
-      const response = await searchBooks({
-        query: activeParamsRef.current.query,
-        page: nextPage,
-        size: 10,
-        target: activeParamsRef.current.target,
-      });
-
-      setBooks((prev) => [...prev, ...response.documents]);
-      setPage(nextPage);
-      setIsEnd(response.meta.is_end);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '추가 데이터를 불러오는 중 오류가 발생했습니다.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [isLoading, isEnd, page]);
+  const totalCount = data?.pages[0]?.meta.total_count ?? 0;
+  const isEnd = searchParams.query ? !hasNextPage : false;
+  const isLoading = isFetching || isFetchingNextPage;
+  const errorMessage =
+    error instanceof Error
+      ? error.message
+      : error
+        ? '도서 검색 중 오류가 발생했습니다.'
+        : null;
 
   return {
-    query,
-    condition,
-    setCondition,
+    query: searchParams.query,
     books,
     totalCount,
     isLoading,
     isEnd,
-    error,
+    error: errorMessage,
     executeSearch,
     loadMore,
   };
 }
-
