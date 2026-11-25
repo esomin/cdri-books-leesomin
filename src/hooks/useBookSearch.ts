@@ -20,6 +20,7 @@ export function useBookSearch() {
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
+    refetch,
   } = useInfiniteQuery({
     queryKey: ['books', searchParams.query, searchParams.target],
     queryFn: ({ pageParam }) =>
@@ -76,5 +77,6 @@ export function useBookSearch() {
     error: errorMessage,
     executeSearch,
     loadMore,
+    refetch,
   };
 }

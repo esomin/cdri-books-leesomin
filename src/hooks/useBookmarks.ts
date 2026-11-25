@@ -1,52 +1,46 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useLocalStorage } from './useLocalStorage';
 import type { BookItem } from '../types/book';
 
 export const BOOKMARKS_STORAGE_KEY = 'certicos_bookmarked_books';
 
-function loadBookmarks(): BookItem[] {
-  try {
-    const raw = localStorage.getItem(BOOKMARKS_STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveBookmarks(items: BookItem[]): void {
-  try {
-    localStorage.setItem(BOOKMARKS_STORAGE_KEY, JSON.stringify(items));
-  } catch {
-    // Ignore storage quota or serialization errors
-  }
+export function getBookKey(book: Pick<BookItem, 'isbn' | 'url'>): string {
+  return book.isbn || book.url;
 }
 
 export function useBookmarks() {
-  const [bookmarks, setBookmarks] = useState<BookItem[]>(() => loadBookmarks());
+  const [bookmarks, setBookmarks] = useLocalStorage<BookItem[]>(
+    BOOKMARKS_STORAGE_KEY,
+    []
+  );
 
-  useEffect(() => {
-    saveBookmarks(bookmarks);
-  }, [bookmarks]);
-
-  const isBookmarked = useCallback(
-    (isbn: string) => bookmarks.some((item) => item.isbn === isbn),
+  const bookmarkedKeySet = useMemo(
+    () => new Set(bookmarks.map((item) => getBookKey(item))),
     [bookmarks]
   );
 
-  const toggleBookmark = useCallback((book: BookItem) => {
-    setBookmarks((prev) => {
-      const exists = prev.some((item) => item.isbn === book.isbn);
-      if (exists) {
-        return prev.filter((item) => item.isbn !== book.isbn);
-      }
-      const snapshot: BookItem = {
-        ...book,
-        bookmarkedAt: new Date().toISOString(),
-      };
-      return [snapshot, ...prev];
-    });
-  }, []);
+  const isBookmarked = useCallback(
+    (key: string) => bookmarkedKeySet.has(key),
+    [bookmarkedKeySet]
+  );
+
+  const toggleBookmark = useCallback(
+    (book: BookItem) => {
+      const targetKey = getBookKey(book);
+      setBookmarks((prev) => {
+        const exists = prev.some((item) => getBookKey(item) === targetKey);
+        if (exists) {
+          return prev.filter((item) => getBookKey(item) !== targetKey);
+        }
+        const snapshot: BookItem = {
+          ...book,
+          bookmarkedAt: new Date().toISOString(),
+        };
+        return [snapshot, ...prev];
+      });
+    },
+    [setBookmarks]
+  );
 
   return {
     bookmarks,
@@ -54,4 +48,3 @@ export function useBookmarks() {
     toggleBookmark,
   };
 }
-
