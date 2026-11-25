@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
+import { useRecentSearches } from '../hooks/useRecentSearches';
+import { RecentSearchesPopover } from './RecentSearchesPopover';
 
 interface SearchBarProps {
   initialKeyword?: string;
@@ -17,16 +19,42 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   rightAction,
 }) => {
   const [keyword, setKeyword] = useState(initialKeyword);
+  const [isFocused, setIsFocused] = useState(false);
+  const { recentSearches, addSearch, removeSearch } = useRecentSearches();
+
+  const submitSearch = (rawKeyword: string) => {
+    const trimmed = rawKeyword.trim();
+    if (trimmed) {
+      addSearch(trimmed);
+    }
+    setIsFocused(false);
+    onSearch(trimmed);
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      onSearch(keyword.trim());
+      submitSearch(keyword);
     }
   };
 
   const handleSearchSubmit = () => {
-    onSearch(keyword.trim());
+    submitSearch(keyword);
+  };
+
+  const handleSelectRecent = (selectedKeyword: string) => {
+    setKeyword(selectedKeyword);
+    submitSearch(selectedKeyword);
+  };
+
+  const handleFocus = () => {
+    setIsFocused(true);
+    onFocus?.();
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+    onBlur?.();
   };
 
   return (
@@ -41,8 +69,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
           onKeyDown={handleKeyDown}
-          onFocus={onFocus}
-          onBlur={onBlur}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           placeholder="검색어를 입력하세요"
           className="flex-1 h-full text-body2 text-text-primary placeholder:text-text-subtitle outline-none bg-transparent pr-2"
         />
@@ -54,6 +82,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         >
           <Search className="w-5 h-5 stroke-[2.2]" />
         </button>
+
+        <RecentSearchesPopover
+          items={recentSearches}
+          isOpen={isFocused}
+          onSelect={handleSelectRecent}
+          onRemove={removeSearch}
+        />
       </div>
 
       {rightAction && <div className="shrink-0">{rightAction}</div>}
