@@ -37,8 +37,10 @@ export function App() {
     totalCount,
     isLoading,
     isEnd,
+    error,
     executeSearch,
     loadMore,
+    refetch,
   } = useBookSearch();
 
   // /search 경로의 쿼리 파라미터 변경 시 검색 실행
@@ -118,6 +120,8 @@ export function App() {
                   books={books}
                   totalCount={totalCount}
                   isLoading={isLoading}
+                  error={error}
+                  onRetry={() => void refetch()}
                   isBookmarked={isBookmarked}
                   onToggleBookmark={toggleBookmark}
                   sentinelRef={sentinelRef}

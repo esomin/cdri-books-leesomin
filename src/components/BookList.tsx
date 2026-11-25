@@ -1,12 +1,16 @@
 import React from 'react';
-import { BookOpen } from 'lucide-react';
-import type { BookItem } from '../types/book';
+import { BookOpen, AlertCircle } from 'lucide-react';
 import { BookItemCard } from './BookItemCard';
+import { Button } from './ui/Button';
+import { getBookKey } from '../hooks/useBookmarks';
+import type { BookItem } from '../types/book';
 
 interface BookListProps {
   books: BookItem[];
   totalCount: number;
   isLoading: boolean;
+  error?: string | null;
+  onRetry?: () => void;
   isBookmarked: (isbn: string) => boolean;
   onToggleBookmark: (book: BookItem) => void;
   countLabel?: string;
@@ -18,6 +22,8 @@ export const BookList: React.FC<BookListProps> = ({
   books,
   totalCount,
   isLoading,
+  error = null,
+  onRetry,
   isBookmarked,
   onToggleBookmark,
   countLabel = '도서 검색 결과',
@@ -26,16 +32,35 @@ export const BookList: React.FC<BookListProps> = ({
 }) => {
   return (
     <section className="w-full">
-      {/* 결과 헤더 카운트 */}
-      <div className="py-4 border-b border-gray">
-        <h2 className="text-body2 font-bold text-text-primary">
-          {countLabel} 총 <span className="text-primary">{totalCount.toLocaleString('ko-KR')}</span>건
-        </h2>
+      <div className="mb-4 text-body2 text-text-primary flex items-center gap-1.5">
+        <span>{countLabel}</span>
+        <span>
+          총 <strong className="text-primary font-bold">{totalCount.toLocaleString()}</strong>건
+        </span>
       </div>
 
-      {/* 도서 목록이 비어있는 경우 */}
-      {books.length === 0 && !isLoading && (
-        <div className="py-20 flex flex-col items-center justify-center text-center">
+      {error && !isLoading && books.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-16 h-16 rounded-full bg-light-gray flex items-center justify-center mb-4">
+            <AlertCircle className="w-8 h-8 text-red" />
+          </div>
+          <p className="text-body2 text-text-secondary mb-4">{error}</p>
+          {onRetry && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onRetry}
+              className="rounded-[var(--radius-button)] text-[12px] font-medium px-3 py-1.5 h-8"
+            >
+              다시 시도
+            </Button>
+          )}
+        </div>
+      )}
+
+      {!error && !isLoading && books.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
           <div className="w-16 h-16 rounded-full bg-light-gray flex items-center justify-center mb-4">
             <BookOpen className="w-8 h-8 text-text-subtitle" />
           </div>
@@ -43,28 +68,29 @@ export const BookList: React.FC<BookListProps> = ({
         </div>
       )}
 
-      {/* 도서 아이템 카드 리스트 */}
-      <div className="flex flex-col">
-        {books.map((book, idx) => (
-          <BookItemCard
-            key={`${book.isbn || book.url}-${idx}`}
-            book={book}
-            isBookmarked={isBookmarked(book.isbn)}
-            onToggleBookmark={onToggleBookmark}
-          />
-        ))}
-      </div>
+      {books.length > 0 && (
+        <div className="border-t border-gray">
+          {books.map((book) => {
+            const bookKey = getBookKey(book);
+            return (
+              <BookItemCard
+                key={bookKey}
+                book={book}
+                isBookmarked={isBookmarked(bookKey)}
+                onToggleBookmark={onToggleBookmark}
+              />
+            );
+          })}
+        </div>
+      )}
 
-      {/* 로딩 표시 */}
       {isLoading && (
-        <div className="py-8 flex justify-center items-center">
+        <div className="py-8 flex justify-center">
           <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
         </div>
       )}
 
-      {/* 무한 스크롤 감지 센서 */}
-      {sentinelRef && <div ref={sentinelRef} className="h-4 w-full" />}
+      {sentinelRef && <div ref={sentinelRef} className="h-4" />}
     </section>
   );
 };
-
