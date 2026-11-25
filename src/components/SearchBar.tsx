@@ -71,7 +71,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         굵은 블랙 테두리(border-2 border-black) + 3px 라운딩
         돋보기 버튼은 별도 배경색 없이 인풋 내부 우측에 자연스럽게 위치
       */}
-      <div className="relative flex-1 flex items-center h-12 border-2 border-black rounded-[var(--radius-button)] bg-white px-3 transition-colors">
+      <div className="relative flex-1 flex items-center h-12 bg-white border border-gray focus-within:border-primary rounded-[var(--radius-button)] px-3.5 transition-colors">
         <input
           type="text"
           value={keyword}

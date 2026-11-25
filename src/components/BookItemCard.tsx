@@ -57,8 +57,8 @@ export const BookItemCard: React.FC<BookItemCardProps> = ({
           onClick={toggleExpand}
         >
           {/* 좌측: 도서 썸네일 & 제목 / 저자 */}
-          <div className="flex items-center gap-3.5 min-w-0">
-            <div className="relative w-11 h-15 bg-light-gray rounded-[var(--radius-button)] shrink-0 overflow-hidden flex items-center justify-center">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="relative w-14 h-20 bg-light-gray rounded-[4px] border border-black/8 shadow-xs shrink-0 overflow-hidden flex items-center justify-center">
               {book.thumbnail ? (
                 <img
                   src={book.thumbnail}
@@ -89,10 +89,10 @@ export const BookItemCard: React.FC<BookItemCardProps> = ({
 
             <Button
               type="button"
-              variant="default"
+              variant="ghost"
               size="sm"
               onClick={handlePurchase}
-              className="bg-primary text-white text-[11px] font-bold px-3 py-1.5 h-7"
+              className="bg-primary/10 text-primary hover:bg-primary/15 text-[13px] font-semibold px-3.5 py-2 h-8 rounded-[6px]"
             >
               구매하기
             </Button>
@@ -100,7 +100,7 @@ export const BookItemCard: React.FC<BookItemCardProps> = ({
             <button
               type="button"
               onClick={toggleExpand}
-              className="flex items-center gap-0.5 bg-transparent hover:text-text-primary text-[12px] text-text-secondary py-1 px-1 transition-colors cursor-pointer"
+              className="flex items-center gap-1 bg-light-gray hover:bg-gray/40 text-[12px] text-text-secondary hover:text-text-primary py-1.5 px-2.5 rounded-[6px] transition-colors cursor-pointer"
             >
               <span>상세보기</span>
               <ChevronDown className="w-3.5 h-3.5 text-text-subtitle" />
@@ -218,7 +218,7 @@ export const BookItemCard: React.FC<BookItemCardProps> = ({
                   variant="default"
                   size="default"
                   onClick={handlePurchase}
-                  className="w-full bg-primary text-white text-[12px] font-bold py-2.5 h-9 shadow-xs"
+                  className="w-44 bg-primary text-white text-[14px] font-semibold py-2.5 h-10 rounded-[var(--radius-button)] shadow-xs"
                 >
                   구매하기
                 </Button>
